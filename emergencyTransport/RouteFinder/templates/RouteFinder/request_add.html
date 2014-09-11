@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% load staticfiles %}
+<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link href="{ % static 'RouteFinder/' % }css/bootstrap.css" rel="stylesheet" type="text/css"/>
+    <script src="{% static 'RouteFinder/' %}js/bootstrap.js"></script>
+	{{ form.media }}
+	<style>
+		div.ex1 {
+			margin: 2cm 4cm 3cm 4cm;
+		}
+	</style>
+</head>
+<body> 
+	<div class="ex1" >
+		<form action="" method ="post" class="form">
+			{% csrf_token %}
+			{% bootstrap_form form layout=''%}
+			{% buttons %}
+				<button type="submit" class="btn btn-primary">
+					{% bootstrap_icon "star" %} Submit
+				</button>
+			{% endbuttons %}
+		</form>
+	</div>
+</body>

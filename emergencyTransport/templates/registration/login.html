@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% load staticfiles %}
+
+
+{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+{% block content %}
+<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+	{% csrf_token %}
+		<div class=ex1 >
+			<table>
+			<tr>
+				<td>{{ form.username.label_tag }}</td>
+				<td>{{ form.username }}</td>
+			</tr>
+			<tr>
+				<td>{{ form.password.label_tag }}</td>
+				<td>{{ form.password }}</td>
+			</tr>
+			</table>
+			<input type="hidden" name="next" value="{{ next }}" />
+
+			{% buttons %}
+				<button type="submit" class="btn btn-success" />
+					{% bootstrap_icon "user" %} Login
+				</button>
+			{% endbuttons %}
+		</div>
+</form>
+{% endblock %}

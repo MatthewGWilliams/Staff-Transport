@@ -1,0 +1,267 @@
+{% load staticfiles %}
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+
+<head>
+    <style>
+    html, body, #"map_{{ route_segment.id }}" {
+      height: 100%;
+      margin: 0px;
+      padding: 0px
+    }
+    </style>
+    <script>
+        
+        var order_num1 = {{ order1 }};
+        var order_num2 = {{ order2 }};
+        var directionsService = new google.maps.DirectionsService();
+        var map;
+        var rendererOptions = {
+          draggable: false
+        };
+
+        function initialize{{ route_segment.id }}() {
+          //directionsDisplayA = new google.maps.DirectionsRenderer(rendererOptions);
+          //directionsDisplayB = new google.maps.DirectionsRenderer(rendererOptions);
+          var cardiff = new google.maps.LatLng(51.483125, -3.178261);
+          var stops = [];
+          var lats = [];
+          var longs = [];
+          var directionsDisplays = [];
+          for (i = 1; i < 21; i++){
+            lats[i] = parseFloat($("#" + i +"_{{ route_segment.id }}").find('.lat').html());
+            longs[i] = parseFloat($("#" + i +"_{{ route_segment.id }}").find('.lon').html());
+            if((i == 1 || (lats[i] !== lats[i-1] && longs[i] !== longs[i-1])) && (!isNaN(lats[i])  && !isNaN(longs[i]))){
+                stops.push(new google.maps.LatLng(lats[i], longs[i]));
+            }
+          }
+          
+          
+          var mapOptions = {
+            zoom:11,
+            center: cardiff
+          }
+          
+
+          
+          //alert($("#5_{{ route_segment.id }}").find('.lat').html());
+          map = new google.maps.Map(document.getElementById("map_{{ route_segment.id }}"), mapOptions);
+          //var trafficLayer = new google.maps.TrafficLayer();
+          //trafficLayer.setMap(map);
+          
+          var directionsDisplayA = new google.maps.DirectionsRenderer({polylineOptions: {strokeColor: "blue"}});
+          directionsDisplayA.setMap(map);
+          var numOfStops = stops.length;
+          if (numOfStops < 9){
+            setTimeout(function(){calcRoute(directionsDisplayA, stops.slice(0,numOfStops+1))}, 500);//500 * order_num1 + 500 * order_num2);
+          }else{
+            setTimeout(function(){calcRoute(directionsDisplayA, stops.slice(0,10))}, 500);//500 * order_num1 + 500 * order_num2);
+            if (numOfStops < 20){
+                var directionsDisplayB = new google.maps.DirectionsRenderer({polylineOptions: {strokeColor: "green"} });
+                directionsDisplayB.setMap(map);
+                setTimeout(function(){calcRoute(directionsDisplayB, stops.slice(9, numOfStops))}, 500);//500 * order_num1 + 500 * order_num2 + 500);
+            }else{
+                setInterval(function(){calcRoute(directionsDisplayB, stops.slice(9, 19))}, 500);//500 * order_num1 + 500 * order_num2 + 500); 
+                if (numOfStops = 20){
+                    var directionsDisplayC = new google.maps.DirectionsRenderer({polylineOptions: {strokeColor: "purple"} });
+                    directionsDisplayC.setMap(map);
+                    setTimeout(function(){calcRoute(directionsDisplayC, stops.slice(18,20))}, 500);//500 * order_num1 + 500 * order_num2 + 1000);
+                }
+            }
+          }
+        }
+          //google.maps.event.trigger(map, 'resize');  
+          
+
+        function calcRoute(directionsDisplay, stop_list) {
+          var num = stop_list.length;
+          var start = stop_list[0];
+          var end = stop_list[num-1];
+          var wpoints = []
+          for (i = 1; i < num-1; i++){
+            wpoints.push({location: stop_list[i]});
+          }
+          var request = {
+              origin:start,
+              destination:end,
+              waypoints: wpoints,
+              travelMode: google.maps.TravelMode.DRIVING
+          };
+          directionsService.route(request, function(response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+              directionsDisplay.setDirections(response);
+            }
+          });
+        }
+        
+        //$( "#map_{{ route_segment.id }}" ).click(function() {
+        //            initialize;
+        //        });
+        
+        //google.maps.event.addDomListener(window, 'load', initialize);
+        //$("#mapbuttion_{{ route_segment.id }}").addEventListener('click', function(){initialize;}, false);
+        //google.maps.event.addDomListener( id={{ driver.driver_name }}results, 'load', initialize);
+        //google.maps.event.addListenerOnce(map, 'idle', function() {google.maps.event.trigger(map, 'resize');
+        //                                                            map.setCenter(cardiff);
+        //                                                            });
+    </script>
+</head>
+
+<div class="routeResults">
+    <p>Route segment number {{ route_segment.id }}</p>
+    <table class="table" id="results">
+        <tr>
+            <td><b>Name</b></td>
+            <td><b>Time</b></td>
+            <td><b>Address</b></td>
+        </tr>
+        {% for key, value in stops.items %}
+            {% if key == route_segment.id %}
+                <tr id="1_{{ route_segment.id }}">
+                    <td>{{ value.1.name }}</td>
+                    <td>{{ value.1.time }}</td>
+                    <td>{{ value.1.location.address }}</td>
+                    <td class="lat" hidden>{{ value.1.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.1.location.longitude }}</td>
+                </tr>
+                <tr id="2_{{ route_segment.id }}">
+                    <td>{{ value.2.name }}</td>
+                    <td>{{ value.2.time }}</td>
+                    <td>{{ value.2.location.address }}</td>
+                    <td class="lat" hidden>{{ value.2.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.2.location.longitude }}</td>                                            
+                </tr>
+                <tr id="3_{{ route_segment.id }}">
+                    <td>{{ value.3.name }}</td>
+                    <td>{{ value.3.time }}</td>
+                    <td>{{ value.3.location.address }}</td>
+                    <td class="lat" hidden>{{ value.3.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.3.location.longitude }}</td>                                            
+                </tr>
+                <tr id="4_{{ route_segment.id }}">
+                    <td>{{ value.4.name }}</td>
+                    <td>{{ value.4.time }}</td>
+                    <td>{{ value.4.location.address }}</td>
+                    <td class="lat" hidden>{{ value.4.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.4.location.longitude }}</td>                                            
+                </tr>
+                 <tr id="5_{{ route_segment.id }}">
+                    <td>{{ value.5.name }}</td>
+                    <td>{{ value.5.time }}</td>
+                    <td>{{ value.5.location.address }}</td>
+                    <td class="lat" hidden>{{ value.5.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.5.location.longitude }}</td>                                            
+                </tr>
+                <tr id="6_{{ route_segment.id }}">
+                    <td>{{ value.6.name }}</td>
+                    <td>{{ value.6.time }}</td>
+                    <td>{{ value.6.location.address }}</td>
+                    <td class="lat" hidden>{{ value.6.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.6.location.longitude }}</td>                                            
+                </tr>
+                <tr id="7_{{ route_segment.id }}">
+                    <td>{{ value.7.name }}</td>
+                    <td>{{ value.7.time }}</td>
+                    <td>{{ value.7.location.address }}</td>
+                    <td class="lat" hidden>{{ value.7.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.7.location.longitude }}</td>                                            
+                </tr>
+                <tr id="8_{{ route_segment.id }}">
+                    <td>{{ value.8.name }}</td>
+                    <td>{{ value.8.time }}</td>
+                    <td>{{ value.8.location.address }}</td>
+                    <td class="lat" hidden>{{ value.8.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.8.location.longitude }}</td>                                            
+                </tr>
+                <tr id="9_{{ route_segment.id }}">
+                    <td>{{ value.9.name }}</td>
+                    <td>{{ value.9.time }}</td>
+                    <td>{{ value.9.location.address }}</td>
+                    <td class="lat" hidden>{{ value.9.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.9.location.longitude }}</td>                                            
+                </tr>
+                <tr id="10_{{ route_segment.id }}">
+                    <td>{{ value.10.name }}</td>
+                    <td>{{ value.10.time }}</td>
+                    <td>{{ value.10.location.address }}</td>
+                    <td class="lat" hidden>{{ value.10.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.10.location.longitude }}</td>                                            
+                </tr>
+                <tr id="11_{{ route_segment.id }}">
+                    <td>{{ value.11.name }}</td>
+                    <td>{{ value.11.time }}</td>
+                    <td>{{ value.11.location.address }}</td>
+                    <td class="lat" hidden>{{ value.11.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.11.location.longitude }}</td>                                            
+                </tr>
+                <tr id="12_{{ route_segment.id }}">
+                    <td>{{ value.12.name }}</td>
+                    <td>{{ value.12.time }}</td>
+                    <td>{{ value.12.location.address }}</td>
+                    <td class="lat" hidden>{{ value.12.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.12.location.longitude }}</td>                                            
+                </tr>
+                 <tr id="13_{{ route_segment.id }}">
+                    <td>{{ value.13.name }}</td>
+                    <td>{{ value.13.time }}</td>
+                    <td>{{ value.13.location.address }}</td>
+                    <td class="lat" hidden>{{ value.13.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.13.location.longitude }}</td>                                            
+                </tr>
+                <tr id="14_{{ route_segment.id }}">
+                    <td>{{ value.14.name }}</td>
+                    <td>{{ value.14.time }}</td>
+                    <td>{{ value.14.location.address }}</td>
+                    <td class="lat" hidden>{{ value.14.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.14.location.longitude }}</td>                                            
+                </tr>
+                <tr id="15_{{ route_segment.id }}">
+                    <td>{{ value.15.name }}</td>
+                    <td>{{ value.15.time }}</td>
+                    <td>{{ value.15.location.address }}</td>
+                    <td class="lat" hidden>{{ value.15.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.15.location.longitude }}</td>                                            
+                </tr>
+                <tr id="16_{{ route_segment.id }}">
+                    <td>{{ value.16.name }}</td>
+                    <td>{{ value.16.time }}</td>
+                    <td>{{ value.16.location.address }}</td>
+                    <td class="lat" hidden>{{ value.16.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.16.location.longitude }}</td>                                            
+                </tr>
+                <tr id="17_{{ route_segment.id }}">
+                    <td>{{ value.17.name }}</td>
+                    <td>{{ value.17.time }}</td>
+                    <td>{{ value.17.location.address }}</td>
+                    <td class="lat" hidden>{{ value.17.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.17.location.longitude }}</td>                                            
+                </tr>
+                 <tr id="18_{{ route_segment.id }}">
+                    <td>{{ value.18.name }}</td>
+                    <td>{{ value.18.time }}</td>
+                    <td>{{ value.18.location.address }}</td>
+                    <td class="lat" hidden>{{ value.18.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.18.location.longitude }}</td>                                            
+                </tr>
+                <tr id="19_{{ route_segment.id }}">
+                    <td>{{ value.19.name }}</td>
+                    <td>{{ value.19.time }}</td>
+                    <td>{{ value.19.location.address }}</td>
+                    <td class="lat" hidden>{{ value.19.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.19.location.longitude }}</td>                                            
+                </tr>
+                <tr id="20_{{ route_segment.id }}">
+                    <td>{{ value.20.name }}</td>
+                    <td>{{ value.20.time }}</td>
+                    <td>{{ value.20.location.address }}</td>
+                    <td class="lat" hidden>{{ value.20.location.latitude }}</td>
+                    <td class="lon" hidden>{{ value.20.location.longitude }}</td>                                            
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+    <p><button id="mapbutton_{{ route_segment.id }}"; onclick="initialize{{ route_segment.id }}()"> <p>Show map</p> </button></p>
+</div>
+<div id="map_{{ route_segment.id }}" style="width: 100%; height: 500px; max-width: none;"></div>

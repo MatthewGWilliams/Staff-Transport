@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% load staticfiles %}
+
+<head>
+	<style>
+		div.ex1 {
+			margin: 5% 5% 5% 5%;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="ex1">
+		<div class="panel panel-default">
+			<div class="panel-heading"><b>Future requests submitted by you</b></div>
+			<div class="panel-" style="clear:both">
+				<form action={% url 'RouteFinder:request_add' %} class="form" style="float:left">	
+					{% buttons %}
+					<button type="submit" class="btn btn-primary">
+						{% bootstrap_icon "plus" %} Add request
+					</button>
+					{% endbuttons %}
+				</form>
+				<form action='/logout/' class="form" style="float:right">	
+					{% buttons %}
+					<button type="submit" class="btn btn-warning">
+						{% bootstrap_icon "off" %} Logout
+					</button>
+					{% endbuttons %}
+				</form>
+			</div>
+			{% if users_request_list %}
+				<table class="table">
+					<tr>
+						<td><b>Staff member</b></td>
+						<td><b>Reason for journey</b></td>
+						<td><b>Shift start/end time</b></td>
+						<td><b>Home address</b></td>
+						<td><b>Work address</b></td>
+						<td></td>
+					</tr>
+					{% for req in users_request_list %}
+						<tr>
+							<td><a href={% url 'RouteFinder:request_update' req.id %}>{{ req.name }}</a></td>
+							<td><a href={% url 'RouteFinder:request_update' req.id %}>{{ req.get_inOut_display }}</a></td>
+							<td><a href={% url 'RouteFinder:request_update' req.id %}>{{ req.ideal_time }}</a></td>
+							<td><a href={% url 'RouteFinder:request_update' req.id %}>{{ req.home_location.address }}</a></td>
+							<td><a href={% url 'RouteFinder:request_update' req.id %}>{{ req.work_location.address }}</a></td>
+							<td>
+								<form action={% url 'RouteFinder:request_delete' req.id %} method="post", class="form">
+									{% csrf_token %}
+									{% buttons %}
+									<button type="submit" class="btn btn-danger">
+										{% bootstrap_icon "trash" %} Delete request
+									</button>
+									{% endbuttons %}
+								</form>
+							</td>
+						</tr>
+					{% endfor %}
+				</table>
+			{% endif %}
+		</div>
+	</div>
+</body>

@@ -8,12 +8,12 @@ C++ implementation of heuristic methods to solve a variant of the pickup and del
 Requirements:
 =============
 
-*Python 2.7
-*Django 1.6
-*django-datetime-widget 0.9 (from pypi)
-*django-bootstrap3
-*django-background-task
-*GCC including g++ with C++11 support
+* Python 2.7
+* Django 1.6
+* django-datetime-widget 0.9 (from pypi)
+* django-bootstrap3
+* django-background-task
+* GCC including g++ with C++11 support
 
 Installation
 ============

@@ -18,7 +18,7 @@ Requirements
 Installation
 ============
 
-emergencyTransport is the main project. This can be copied if you have the secret key from me, or it can be used as a template for setting up a new project. An
+`emergencyTransport` is the main project. This can be copied if you have the secret key from me, or it can be used as a template for setting up a new project. An
 API key can be obtained from Google, it is used for geopositioning in the form widget.
 The CustomGeoposition and templates folders just need to be copied to the corresponding position for your project. The RouteFinder app should also be copied into the corresponding location, but the command
 "python setup.py build_ext --inplace" must then be called from the apps directory. This compiles the C++ route finder into a python module that is used by the web interface to plan vehicle routes.
